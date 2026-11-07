@@ -136,9 +136,13 @@ def simd_features(simd: Dict[str, Any]) -> Dict[str, Any]:
                 "spearman": f["spearman"],
             }
     out: Dict[str, Any] = {"ops": ops, "flags": list(simd.get("simd_flags") or [])}
-    ref = (ops.get("memcpy") or {}).get("gbps")
-    if ref:
-        out["profile"] = {op: math.log2(v["gbps"] / ref) for op, v in ops.items() if v["gbps"] > 0}
+    logs = {op: math.log2(v["gbps"]) for op, v in ops.items() if v["gbps"] > 0}
+    if len(logs) >= 3:
+        # Centre on the median op: robust to noise in any single reference op.
+        mid = _stats.median(list(logs.values()))
+        out["profile"] = {op: v - mid for op, v in logs.items()}
+    if "memcpy" in logs and "sha256" in logs:
+        out["log2_memcpy_over_sha256"] = logs["memcpy"] - logs["sha256"]
     s256 = (ops.get("sha256") or {}).get("gbps")
     s512 = (ops.get("sha512") or {}).get("gbps")
     if s256 and s512:

@@ -26,8 +26,8 @@ PROFILES: Dict[str, Dict[str, Any]] = {
         "clock_reads": 20000,
         "clock_samples": 400,
         "clock_n": (200, 800),
-        "simd_per_op": 16,
-        "simd_size_log2": (12.0, 20.0),
+        "simd_per_op": 32,
+        "simd_size_log2": (12.0, 21.0),
         "module_budget_s": 60.0,
     },
     "quick": {

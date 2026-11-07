@@ -152,8 +152,8 @@ def test_jitter_and_simd_features_synthetic():
         sim.append([i, "sha512", size, 0, size + 100, "x"])         # 1 GB/s
     sf = features.simd_features({"samples": sim, "simd_flags": ["sha_ni"]})
     assert abs(sf["sha256_over_sha512"] - 2.0) < 0.05
-    assert sf["profile"]["memcpy"] == 0.0
-    assert sf["profile"]["sha256"] < 0
+    assert sf["profile"]["sha256"] == 0.0  # the median op
+    assert abs(sf["log2_memcpy_over_sha256"] - 2.32) < 0.05
 
 
 def test_extract_handles_empty_record():
