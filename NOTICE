@@ -1,0 +1,10 @@
+hwattest
+Copyright 2024-2026 Scott Boudreaux / Elyan Labs
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Portions of the measurement ideas and code (clock-drift sampling, cache-timing
+sweep, instruction-path jitter loops, SIMD feature detection, VM/hypervisor
+string indicators, ROM/hash-clustering for emulator farms) are ported and
+reworked from Scott Boudreaux / Elyan Labs' earlier hardware-fingerprint
+modules, which were released under the Apache License, Version 2.0.

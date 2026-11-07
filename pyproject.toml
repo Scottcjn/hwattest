@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hwattest"
+version = "0.1.0"
+description = "Open, privacy-preserving, probabilistic hardware-authenticity scoring (client measures, self-hosted server scores and clusters)."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Apache-2.0"}
+authors = [{name = "Scott Boudreaux / Elyan Labs"}]
+dependencies = []
+
+[project.optional-dependencies]
+numpy = ["numpy"]
+
+[project.scripts]
+hwattest = "hwattest.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+ignore = ["UP006", "UP007", "UP035", "UP045"]
+
+[tool.mypy]
+python_version = "3.10"  # mypy minimum; code targets 3.9 (ruff py39)
+strict = true
+mypy_path = "src"
+files = ["src/hwattest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
