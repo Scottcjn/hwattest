@@ -1,14 +1,27 @@
 # hwattest
 
-An open, self-hostable, **probabilistic** hardware-authenticity score: *how
-likely is it that this submission came from a distinct physical machine of the
-claimed class, and not from a VM, an emulator, a replayed trace, or a clone of
-a machine we have already seen?* The client measures; a server you run yourself
-scores and clusters. The output is a set of scores with reasons, never a
-yes/no "proof".
+**Is this benchmark result real?** One command, ~90 seconds: *how likely is it
+that this number was produced on a real, distinct physical machine — and not on
+a VM, an emulator, a replayed trace, or a clone of a machine we have already
+seen — with the reasons spelled out.*
+
+A tok/s or a Geekbench score you read off the internet is self-reported. It is
+trivial to post a fast number that a cloud VM, a binary-translation emulator, or
+a recording of someone else's machine produced. hwattest attaches a
+**probabilistic hardware-authenticity score with reasons** to a result, so a
+leaderboard or a bounty program can tell "measured on real hardware, score 0.97"
+from "unverifiable." The client measures; a server you run yourself scores and
+clusters. The output is a set of scores with reasons, **never a yes/no proof.**
+
+It is eval-first on purpose: the numbers below ([Evaluation](#evaluation-so-far-one-machine))
+and the open hole we already know about ([Known open bypasses](#known-open-bypasses-v01))
+are the whole credibility story. If you want the bottom line before the pitch:
+on one machine the signals separate cleanly (AUC 1.00, 0 false-rejects on 25
+real runs), **and** a rank-relabel-plus-noise forgery passes v0.1 verification
+today. Both are true; both are below.
 
 Version 0.1. Apache-2.0. Python 3.9+ standard library only (numpy is not
-needed).
+needed). There is no token, coin, or blockchain anywhere in this project.
 
 ## Honest limits (read these first)
 
@@ -51,8 +64,24 @@ Ryzen 7 8845HS, 16 threads, Linux 6.17). Treat it as a sanity check that the
 signals separate on this machine, **not** as a general accuracy claim. The
 cross-machine questions are unanswered until the fleet runs (`eval/FLEET_PLAN.md`).
 
-Dataset: `eval/data/local/` (41 records), reproduce with `eval/run_local.sh`,
-score with `eval/evaluate.py`.
+Dataset: `eval/data/local/` (41 records; derived features + per-sample timings,
+**no machine identifiers** — enforced by `eval/verify_no_identifiers.py` and a
+CI test, documented in [`eval/DATASHEET.md`](eval/DATASHEET.md)). Reproduce the
+numbers end to end:
+
+```bash
+PYTHON=../.venv/bin/python eval/run_local.sh          # re-collect (this machine)
+python3 eval/evaluate.py eval/data/local/*.jsonl \
+        --out eval/results/local_metrics.json         # ROC/AUC, FPR, confusion
+python3 eval/replay.py --trials 10 \
+        --out eval/results/replay.json                # the replay/forgery attacks
+python3 eval/verify_no_identifiers.py 'eval/data/local/*.jsonl'  # privacy gate
+```
+
+Every attempted attack and its status lives in the public
+[`eval/attacks/FOOLED_IT.md`](eval/attacks/FOOLED_IT.md) log — including the one
+that works (below). If you land a new one, send a reproduce recipe and it goes
+in the table with credit.
 
 | Group | n | how |
 |---|---|---|
@@ -225,11 +254,25 @@ hwattest serve --rp-id my-bounty --data-dir ./hwattest-data --admin-token-file t
 hwattest measure --server http://127.0.0.1:8787 --rp my-bounty --account alice
 ```
 
-Bounty programs: contributors run `hwattest measure --server URL --rp
-<program> --account <github-handle>`; the program reads back scores, reasons
-and `cluster_id` from the submit response (or `GET /v1/clusters` with the
-admin token). Benchmark leaderboards: `--bind <sha256 of the result>` puts
-the result hash inside the digest of an attestation for a fresh nonce.
+**Benchmark leaderboards (the main use).** Bind the result to the attestation:
+`--bind <sha256 of the result>` puts the result hash inside the signed digest of
+an attestation for a fresh nonce, so the score belongs to *that* number and
+cannot be transplanted onto another. A leaderboard stores
+`(result, bind, score, reasons, cluster_id)` and shows "measured on real
+hardware, score 0.97" next to each row. The reference integration for a tok/s
+benchmark runner is in
+[`docs/AFTERLIFE_INTEGRATION.md`](docs/AFTERLIFE_INTEGRATION.md)
+(`afterlife bench --attest`).
+
+```bash
+R=$(sha256sum results.json | cut -d' ' -f1)
+hwattest measure --server http://127.0.0.1:8787 --rp my-leaderboard --bind "$R"
+```
+
+**Bounty programs / sybil checks.** Contributors run `hwattest measure --server
+URL --rp <program> --account <handle>`; the program reads back scores, reasons
+and `cluster_id` from the submit response (or `GET /v1/clusters` with the admin
+token) to see when many accounts resolve to one physical machine.
 
 HTTP API: `POST /v1/challenge {rp_id, profile}`, `POST /v1/submit {payload,
 account}`, `GET /v1/clusters?rp_id=` (Bearer admin token), `GET /v1/health`.
@@ -246,6 +289,12 @@ python3 -m venv .venv && .venv/bin/pip install -e . ruff mypy pytest
 Apache-2.0 (see `LICENSE`, `NOTICE`). Copyright 2024-2026 Scott Boudreaux /
 Elyan Labs. Measurement ideas and parts of the code are ported and reworked
 from Elyan Labs' earlier Apache-2.0 hardware-fingerprint modules.
+
+## Citation
+
+If you use hwattest or its dataset, cite via [`CITATION.cff`](CITATION.cff) (a
+DOI release is planned on Zenodo). The dataset is documented in
+[`eval/DATASHEET.md`](eval/DATASHEET.md).
 
 ## Project layout
 

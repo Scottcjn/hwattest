@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use hwattest or its evaluation dataset, please cite it as below."
+title: "hwattest: open probabilistic hardware-authenticity scoring with reasons"
+abstract: >-
+  hwattest attaches a probabilistic, privacy-preserving hardware-authenticity
+  score to a submission (e.g. a benchmark result): how likely it was produced on
+  a real, distinct physical machine rather than a VM, an emulator, a replayed
+  trace, or a clone of a machine already seen. Software-only timing and device
+  features are measured by a client under a server-issued challenge; a
+  self-hostable server scores and clusters. Output is a score with
+  human-readable reasons, never a yes/no proof. Ships with a labeled evaluation
+  dataset (derived features only, no machine identifiers) and a reproducible
+  harness reporting ROC/AUC, false-positive rate on real hardware, a confusion
+  matrix, same-machine repeatability, and a public log of known bypasses.
+type: software
+version: "0.1.0"
+date-released: "2026-11-06"
+license: Apache-2.0
+repository-code: "https://github.com/Scottcjn/hwattest"
+authors:
+  - family-names: Boudreaux
+    given-names: Scott
+    affiliation: Elyan Labs
+keywords:
+  - hardware attestation
+  - anti-sybil
+  - benchmark integrity
+  - virtual machine detection
+  - emulator detection
+  - replay resistance
+  - privacy
+references:
+  - type: generic
+    title: "hwattest-eval/1 labeled hardware-authenticity dataset (local release)"
+    authors:
+      - family-names: Boudreaux
+        given-names: Scott
+        affiliation: Elyan Labs
+    year: 2026
+    notes: >-
+      41 labeled hwattest measurement runs from one host (bare metal, docker,
+      KVM, hidden KVM, QEMU TCG, hardened TCG). Derived features and per-sample
+      timings only; no machine identifiers. See eval/DATASHEET.md.
