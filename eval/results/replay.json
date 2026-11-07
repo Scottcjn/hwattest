@@ -1,0 +1,63 @@
+{
+ "trials": 10,
+ "profile": "standard",
+ "outcome": {
+  "genuine": {
+   "accepted": 10
+  },
+  "resubmit": {
+   "rejected": 10
+  },
+  "swap_challenge": {
+   "rejected": 10
+  },
+  "relabel_index": {
+   "rejected": 10
+  },
+  "relabel_rank": {
+   "rejected": 10
+  },
+  "relabel_rank_noise": {
+   "accepted": 10
+  }
+ },
+ "rejection_reasons": {
+  "genuine": {},
+  "resubmit": {
+   "nonce_reused": 10
+  },
+  "swap_challenge": {
+   "cache_param_mismatch": 7,
+   "claims_more_time_than_elapsed": 10,
+   "clock_param_mismatch": 10,
+   "jitter_param_mismatch": 10,
+   "simd_param_mismatch": 10,
+   "timing_trace_replayed": 10,
+   "cache_not_plan_prefix": 3
+  },
+  "relabel_index": {
+   "cache_durations_do_not_track_parameters": 9,
+   "clock_durations_do_not_track_parameters": 10,
+   "jitter_durations_do_not_track_parameters": 10,
+   "simd_durations_do_not_track_parameters": 10,
+   "simd_implausibly_fast": 10,
+   "timing_trace_replayed": 5
+  },
+  "relabel_rank": {
+   "synthetic_monotone_timings": 10
+  },
+  "relabel_rank_noise": {}
+ },
+ "accepted_forgery_similarity_to_source": [
+  0.333,
+  0.456,
+  0.35,
+  0.325,
+  0.195,
+  0.509,
+  0.348,
+  0.343,
+  0.355,
+  0.358
+ ]
+}

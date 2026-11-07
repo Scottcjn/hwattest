@@ -7,7 +7,7 @@
 #         kvm_hidden   KVM, -cpu host,-hypervisor,kvm=off + SMBIOS spoofed to an OEM
 #                      (the "VM-hiding" adversary)
 #         tcg          pure emulation (TCG), -cpu max
-#         tcg_hardened TCG, SMBIOS + CPU model string spoofed
+#         tcg_hardened TCG, CPUID hypervisor bit cleared, SMBIOS + CPU model string spoofed
 #
 # Needs: qemu-system-x86_64, sshpass, a cloud image with python3 >= 3.9 whose
 # cloud-init seed sets user "ubuntu" / password "hwfp" (BASE_IMG / SEED_ISO).
@@ -36,7 +36,7 @@ case "$MODE" in
   kvm)          ACCEL=(-accel kvm -cpu host); SUB=kvm; LABEL=vm ;;
   kvm_hidden)   ACCEL=(-accel kvm -cpu host,-hypervisor,kvm=off "${SPOOF[@]}"); SUB=kvm_hidden; LABEL=vm ;;
   tcg)          ACCEL=(-accel tcg -cpu max); SUB=tcg; LABEL=emulator ;;
-  tcg_hardened) ACCEL=(-accel tcg -cpu "max,model-id=Intel(R) Xeon(R) CPU E5-2670 v3 @ 2.30GHz" "${SPOOF[@]}"); SUB=tcg_hardened; LABEL=emulator ;;
+  tcg_hardened) ACCEL=(-accel tcg -cpu "max,-hypervisor,model-id=Intel(R) Xeon(R) CPU E5-2670 v3 @ 2.30GHz" "${SPOOF[@]}"); SUB=tcg_hardened; LABEL=emulator ;;
   *) echo "unknown mode $MODE"; exit 2 ;;
 esac
 
