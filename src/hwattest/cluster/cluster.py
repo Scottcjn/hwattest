@@ -75,8 +75,8 @@ def _vec_dist(a: Dict[str, Any], b: Dict[str, Any], scale: float) -> Optional[fl
     Median + cap keeps one contention-sensitive region (e.g. the shared L3
     while another process thrashes it) from dominating the comparison.
     """
-    ds = [
-        min(POINT_CAP, abs(a[k] - b[k]) / scale)
+    ds: List[float] = [
+        min(POINT_CAP, abs(float(a[k]) - float(b[k])) / scale)
         for k in a
         if a.get(k) is not None and b.get(k) is not None
     ]
