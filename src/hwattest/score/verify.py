@@ -38,6 +38,7 @@ CONSISTENCY_HARD = 0.2   # Spearman(param, duration) below this is not a real ru
 CONSISTENCY_SOFT = 0.6
 TOO_PERFECT = 0.9995
 COMMON_MODE_MIN_PAIRS = 30
+SUMMARY_INTEGRITY = 0.3  # summary-only submissions cannot be checked against the plan
 
 
 def _t0_idx(module: str) -> int:
@@ -234,6 +235,14 @@ def verify(
     if not plan:
         rej.append("no_plan")
         return _result(rej, warn, checks)
+    if payload.get("mode") == "summary":
+        # Privacy mode: no per-sample data, so nothing below can be checked.
+        checks["summary_only"] = True
+        res = _result(rej, warn, checks)
+        if res["accepted"]:
+            res["integrity"] = SUMMARY_INTEGRITY
+            res["warnings"].append("summary_only_unverifiable")
+        return res
     order_end: List[Tuple[float, float, str]] = []
     total_dur = 0.0
     for mod in ("clock", "cache", "jitter", "simd"):

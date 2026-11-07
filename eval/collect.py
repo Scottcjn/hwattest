@@ -60,7 +60,7 @@ def main():
         with open(a.out, "a") as f:
             for i in range(a.runs):
                 ch = self_challenge("eval", a.profile)
-                payload, _ = attest(ch)
+                payload, _ = attest(ch, no_id=True)  # dataset: no machine IDs
                 rec = {
                     "schema": "hwattest-eval/1",
                     "label": a.label,

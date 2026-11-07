@@ -37,3 +37,5 @@ files = ["src/hwattest"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Keep pytest temp dirs inside the checkout (this lab's /tmp is a small tmpfs).
+addopts = "--basetemp=.pytest_tmp"
