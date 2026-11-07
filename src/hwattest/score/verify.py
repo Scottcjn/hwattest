@@ -187,7 +187,14 @@ def verify(
     spot_checks: int = 3,
     allow_self: bool = False,
     rng: Optional[random.Random] = None,
+    offline: bool = False,
 ) -> Dict[str, Any]:
+    """Verify one submission.
+
+    ``offline=True`` (``hwattest score`` on saved files, evaluation): skip the
+    binding checks that need the issuer's live state (challenge MAC, nonce
+    store, validity window); everything about the samples is still checked.
+    """
     rej: List[str] = []
     warn: List[str] = []
     checks: Dict[str, Any] = {}
@@ -208,11 +215,12 @@ def verify(
 
     # ---- binding: authentic challenge, single-use nonce, time window ----------
     self_issued = ch.get("issuer") == "self"
+    checks["binding"] = "unchecked_offline" if offline else "checked"
     if self_issued:
         checks["self_issued"] = True
         if not allow_self:
             rej.append("self_issued_challenge")
-    else:
+    elif not offline:
         if not authentic(ch):
             rej.append("challenge_not_authentic")
         status = store.consume(nonce)
@@ -222,13 +230,13 @@ def verify(
             rej.append("nonce_unknown")
     issued_at = float(ch.get("issued_at", 0))
     expires_at = float(ch.get("expires_at", 0))
-    if now > expires_at:
+    if now > expires_at and not offline:
         rej.append("challenge_expired")
     server_window = now - issued_at
     claimed = float(session.get("elapsed_ns") or 0) / 1e9
     checks["server_window_s"] = round(server_window, 3)
     checks["client_elapsed_s"] = round(claimed, 3)
-    if not self_issued and claimed > server_window + CLOCK_SLACK_S:
+    if not (self_issued or offline) and claimed > server_window + CLOCK_SLACK_S:
         rej.append("claims_more_time_than_elapsed")
 
     # ---- per-module: exact parameters, ordering, plausibility -----------------
@@ -325,7 +333,7 @@ def verify(
 
     # ---- replay of an identical timing trace under a new nonce ----------------
     th = trace_hash(results)
-    prev = store.trace_seen(th, nonce)
+    prev = store.trace_seen(th, nonce) if store is not None else None
     if prev is not None:
         rej.append("timing_trace_replayed")
     checks["trace_hash"] = th[:16]

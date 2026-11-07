@@ -66,9 +66,25 @@ def fingerprint(feats: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+POINT_CAP = 4.0
+
+
 def _vec_dist(a: Dict[str, Any], b: Dict[str, Any], scale: float) -> Optional[float]:
-    ds = [abs(a[k] - b[k]) / scale for k in a if a.get(k) is not None and b.get(k) is not None]
-    return sum(ds) / len(ds) if ds else None
+    """Median of capped per-point distances.
+
+    Median + cap keeps one contention-sensitive region (e.g. the shared L3
+    while another process thrashes it) from dominating the comparison.
+    """
+    ds = [
+        min(POINT_CAP, abs(a[k] - b[k]) / scale)
+        for k in a
+        if a.get(k) is not None and b.get(k) is not None
+    ]
+    if not ds:
+        return None
+    ds.sort()
+    m = len(ds) // 2
+    return ds[m] if len(ds) % 2 else (ds[m - 1] + ds[m]) / 2
 
 
 def similarity(a: Dict[str, Any], b: Dict[str, Any]) -> Tuple[float, Dict[str, float]]:
