@@ -68,7 +68,8 @@ def main():
                     "host_alias": a.host_alias,
                     "condition": "load" if a.load else "idle",
                     "load_procs": a.load,
-                    "loadavg_1m": round(os.getloadavg()[0], 2) if hasattr(os, "getloadavg") else None,
+                    "loadavg_1m": (round(os.getloadavg()[0], 2)
+                                   if hasattr(os, "getloadavg") else None),
                     "run": i,
                     "collected_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                     "payload": payload,

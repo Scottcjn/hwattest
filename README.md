@@ -246,3 +246,23 @@ python3 -m venv .venv && .venv/bin/pip install -e . ruff mypy pytest
 Apache-2.0 (see `LICENSE`, `NOTICE`). Copyright 2024-2026 Scott Boudreaux /
 Elyan Labs. Measurement ideas and parts of the code are ported and reworked
 from Elyan Labs' earlier Apache-2.0 hardware-fingerprint modules.
+
+## Project layout
+
+```
+src/hwattest/
+  workloads.py   seed-derived kernels shared by client and verifier
+  plan.py        randomized measurement plans (profiles: standard/quick/tiny)
+  challenge.py   HMAC-authenticated challenges, nonce store
+  attest.py      run a plan -> submittable payload
+  privacy.py     payload builder, salted per-RP IDs, inspect/describe
+  measure/       clock, cache, jitter, simd, vmind, tpm (+ _ctx)
+  score/         features, verify (anti-replay), scorer, pipeline
+  cluster/       fingerprint + similarity + clustering
+  server/        stdlib HTTP app + SQLite store
+  cli.py         measure | inspect | serve | score
+tests/           measurement, replay, scoring, clustering, server/CLI
+eval/            collect, evaluate, replay, run_local.sh, vm/, FLEET_PLAN.md
+```
+
+There is no RustChain, token, or blockchain dependency anywhere in the library.
