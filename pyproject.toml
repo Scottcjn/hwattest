@@ -37,5 +37,8 @@ files = ["src/hwattest"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# src-layout: make `import hwattest` work without an editable install, so the
+# suite collects on a plain `python -m pytest` (not only inside a dev venv).
+pythonpath = ["src"]
 # Keep pytest temp dirs inside the checkout (this lab's /tmp is a small tmpfs).
 addopts = "--basetemp=.pytest_tmp"
