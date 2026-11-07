@@ -65,7 +65,7 @@ def test_known_bypass_rank_relabel_with_noise_is_not_detected(issuer, recorded):
     checks (re-executes kernels for results, rank-maps recorded timings onto the
     new parameters and adds noise) passes v0.1 verification. Clustering then
     sees the forged machine as the *same* machine as the recorded one."""
-    forged = relabel(recorded, issuer.issue("rp-test"), mode="rank", noise=0.03, seed=7)
+    forged = relabel(recorded, issuer.issue("rp-test"), mode="rank", noise=0.12, seed=7)
     v = _v(issuer, forged)
     assert v["accepted"], v
 
