@@ -1,5 +1,7 @@
 # hwattest
 
+> **⚠️ Known security issues in v0.1.0 (2026-11-23).** An external security review found that the v0.1.0 verifier can accept a payload with no measurements, can be made to do unbounded work before rejecting a forged challenge, and can crash on malformed input. We reproduced them. A fix is in progress for v0.2.0. **Until then, do not treat a v0.1.0 verdict as evidence.**
+
 **Is this benchmark result real?** One command, ~90 seconds: *how likely is it
 that this number was produced on a real, distinct physical machine — and not on
 a VM, an emulator, a replayed trace, or a clone of a machine we have already
